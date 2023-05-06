@@ -100,26 +100,24 @@ class wang_mendel(object):
             # minimum is implemented
             if(temp_firing < firing_level_of_pairs):
                 firing_level_of_pairs = temp_firing
-            
         return firing_level_of_pairs
 
 
     # Step 5 - Determine a Mapping Based on the Combined Fuzzy Rule Base
-    # Dont use yet!!!
     def compute(self, x_test):
         output_results = []
-        for input_index, i in enumerate(x_test):
+        for input_index, i in enumerate(x_test): #for each input vector
             rule_output_strength = np.empty([len(self.reduced_rules), 1])
             rule_output_strength.fill(np.NaN)
-            # Here
-            for rule_index, rule in enumerate(self.reduced_rules):
-                
-                for i in self.antecedents:
-                    fs = self.antecedents[i].get_degree(input_val)
-                    temp_firings.append(fs) # 1 dim, 7 values
-                rule_output_strength[rule_index] = individual_rule_output(all_firing_strengts[input_index:(input_index + train_obj.p)], rule[0:train_obj.p])
-        
-        return 0
+            temp_firings, y_hat = [],[]
+            for rule_index, rule in enumerate(self.reduced_rules): # for each rule
+                m_o = 1.0
+                for index, x_i in enumerate(i): # for each input value
+                    m_o = m_o * self.antecedents[index][rule[index]].get_degree(x_i)
+                temp_firings.append(m_o)
+                y_hat.append(self.antecedents[len(i)][rule[-2]].get_peak())
+            output_results.append(np.dot(temp_firings, y_hat) / np.sum(temp_firings))
+        return output_results
                        
     @property
     def mf_interval_matrix(self):

@@ -4,19 +4,19 @@ import numpy as np
 class T1_sets(object):
     
     
-    def __init__(self,mean,step,discretisation):
+    def __init__(self, peak, step, discretisation):
         
         
-        self._mean=mean
+        self._peak=peak
         self._step=step
-        self._interval= (mean-(4.0*step) ,mean+(4.0*step) ) 
+        self._interval= (peak - (4.0*step), peak + (4.0 * step) ) 
         self._discrete=discretisation
         
 
    
     @property
-    def mean(self):
-        return self._mean 
+    def peak(self):
+        return self._peak 
    
 
     @property
@@ -39,11 +39,11 @@ class T1_Triangular(T1_sets):
          
         if(x <= left or x>= right):
             degree=0.0
-        elif(x < self._mean ):
-            degree = (x - left) / (self._mean - left)       
-        elif(x > self._mean ):
-            degree = (right - x) / (right - self._mean)
-        elif(x ==self._mean):
+        elif(x < self._peak ):
+            degree = (x - left) / (self._peak - left)       
+        elif(x > self._peak ):
+            degree = (right - x) / (right - self._peak)
+        elif(x ==self._peak):
             degree = 1.0
             
         return(degree)   
@@ -55,14 +55,17 @@ class T1_Triangular(T1_sets):
         for i in list_of_x:
             list_of_mf.append(self.get_degree(i))
         list_of_mf=np.asarray(list_of_mf)
-        return(list_of_mf)    
+        return(list_of_mf)
+
+    def get_peak(self):
+        return self._peak  
     
 
 class T1_Gaussian(T1_sets):
     
     def get_degree(self, x):
         if(x>=self._interval[0] and x<=self._interval[1]):
-            return np.exp(-np.power(x - self.mean, 2.) / (2*np.power(self.step, 2.)))    
+            return np.exp(-np.power(x - self.peak, 2.) / (2*np.power(self.step, 2.)))    
         else:
             return 0.0   
     
@@ -86,10 +89,10 @@ class T1_RightShoulder(T1_sets):
         
         if(x<left):
             return(0.0)
-        elif(x>=self.mean):
+        elif(x>=self.peak):
              return(1)
-        elif(x<self.mean and x>=left):
-            return ( ((x-left)/float(self.mean - left)) )
+        elif(x<self.peak and x>=left):
+            return ( ((x-left)/float(self.peak - left)) )
         else:
             raise ValueError("Something wrong with x in Right Shoulder.")    
     
@@ -101,6 +104,9 @@ class T1_RightShoulder(T1_sets):
             list_of_mf.append(self.get_degree(i))
         list_of_mf=np.asarray(list_of_mf)
         return(list_of_mf)
+    
+    def get_peak(self):
+        return self._peak 
 
 
 class T1_LeftShoulder(T1_sets):
@@ -111,10 +117,10 @@ class T1_LeftShoulder(T1_sets):
         
         if(x>right):
             return(0.0)
-        elif(x<=self.mean):
+        elif(x<=self.peak):
             return(1.0)
-        elif(x>self.mean and x<=right):
-            return ( ((right-x)/float(right-self.mean))  )
+        elif(x>self.peak and x<=right):
+            return ( ((right-x)/float(right-self.peak))  )
         else:
             raise ValueError("Something wrong with x in Left Shoulder.")    
     
@@ -126,5 +132,8 @@ class T1_LeftShoulder(T1_sets):
         for i in list_of_x:
             list_of_mf.append(self.get_degree(i))
         list_of_mf=np.asarray(list_of_mf)
-        return(list_of_mf)   
+        return(list_of_mf)
+    
+    def get_peak(self):
+        return self._peak 
         
